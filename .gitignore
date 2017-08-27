@@ -1,0 +1,5 @@
+*.pyc
+img/*
+img
+notes*
+credentials.py
