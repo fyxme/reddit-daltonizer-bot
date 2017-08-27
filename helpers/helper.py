@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 import os
 import praw
-import daltonizer
-from bot import BOT_VERSION as BOT_VERSION
 import collections
 
 def get_reddit_instance(reddit_credentials):
@@ -20,22 +18,22 @@ def _get_formated_links(name, converted_imgs):
                                  converted_imgs[name][col]["link"])
     return temp[1:-1]
 
-def _get_reply_footer():
+def _get_reply_footer(version):
     return "^( | )".join((
             "^(*I adjust colors of an image submission to accomodate users with colorblindness*)",
             "[^Contact](https://www.reddit.com/message/compose/?to=offdutyhuman)",
             "[^FAQ](https://www.reddit.com/user/DaltonicBot/comments/6v1omy/faq/)",
-            "^v%s" % BOT_VERSION))
+            "^v%s" % version))
 
-def get_reply_message(imgur_album_links):
+def get_reply_message(imgur_album_links,version):
     return "\n\n".join((
         " | ".join((
             "**[Colorblind Enhanced Images](%s)**" % imgur_album_links["daltonized"],
             "**[What colorblind users see](%s)**" % imgur_album_links["simulated"])),
         "----",
-        _get_reply_footer()))
+        _get_reply_footer(version)))
 
-def get_long_reply_message(converted_imgs):
+def get_long_reply_message(converted_imgs, version):
     return "\n\n".join((
         "**Colorblind Enhanced Images:**",
         helper._get_formated_links("daltonized",converted_imgs),
@@ -43,7 +41,7 @@ def get_long_reply_message(converted_imgs):
         "**What Colour-blind Users See:**",
         helper._get_formated_links("simulated",converted_imgs),
         "----",
-        _get_reply_footer()))
+        _get_reply_footer(version)))
 
 def difference_between_images(img1_path,img2_path):
     """

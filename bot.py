@@ -3,8 +3,7 @@
 import time
 import credentials
 from daltonize import DaltonizableImageFromURL
-import helper
-import imgur_helper
+from helpers import helper, imgur_helper
 import StringIO
 
 import collections
@@ -82,7 +81,8 @@ def process_submission(reddit, imgur, submission):
             "simulated":imgur_helper.get_imgur_album_link(
                 imgur_albums["simulated"]["id"]),
             "daltonized":imgur_helper.get_imgur_album_link(
-                imgur_albums["daltonized"]["id"])}))
+                imgur_albums["daltonized"]["id"])},
+            BOT_VERSION))
 
 def test():
     reddit = helper.get_reddit_instance(credentials.reddit)
