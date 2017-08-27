@@ -12,5 +12,6 @@ if [[ ! -d "img" ]]; then
     mkdir img
 fi
 
-echo ">> Please update credentials.py with your credentials"
+echo ">> Update credentials-example.py with your credentials"
+echo ">> Rename credentials-example.py to credentials.py"
 echo ">> Then run get_imgur_token.py to get imgur access and refresh token"
