@@ -4,7 +4,7 @@ from itertools import izip
 from PIL import Image, ImageChops
 import helper
 import urllib
-from daltonize import daltonize
+import daltonize
 import collections
 
 IMG_EXTENSION = "jpg"

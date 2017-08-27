@@ -1,1 +1,1 @@
-# Reddit-Daltonizer-Bot
+# Reddit Daltonizer Bot

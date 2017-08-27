@@ -2,74 +2,92 @@
 
 import time
 import credentials
-import daltonizer
+from daltonize import DaltonizableImageFromURL
 import helper
+import imgur_helper
+import StringIO
 
-BOT_VERSION = "0.3.1"
+import collections
+
+BOT_VERSION = "0.3.3"
 
 SUBREDDITS = ["colorblind", "test"]
-BANNED_FROM_SUBS = ["pics", "pic"]
+
+COLOR_DEFICITS = collections.OrderedDict([
+    ("d", "deuteranopia"),
+    ("p", "protanopia"),
+    ("t", "tritanopia"),
+    ("m", "monochromacy")])
 
 def process_submission(reddit, imgur, submission):
     folder_path = "img/%s" % submission.id
 
-    img = daltonizer.Img(submission.id, submission.url, folder_path)
+    img = DaltonizableImageFromURL(submission.url)
 
-    img.daltonize()
-    img.save_converted()
+    converted_imgs = dict(
+        daltonized=img.daltonize("dpt"),
+        simulated=img.simulate("dptm"))
 
-    converted_imgs = img.get_converted_paths()
+    uploaded_imgs = dict(
+        daltonized=dict(),
+        simulated=dict())
 
-    # Upload images to imgur
-    for clv_type in converted_imgs:
-        print clv_type
-        for col_def in converted_imgs[clv_type]:
-            to_up = "%s/%s" % (folder_path, 
-                               converted_imgs[clv_type][col_def])
-            
-            converted_imgs[clv_type][col_def] = (
-                imgur.upload_from_path(to_up, 
-                    config={"title":helper.get_image_title(clv_type, col_def)},
-                    anon=False))
+    for key in converted_imgs:
+        print key
+        for converted_img in converted_imgs[key]:
+            cvd_type = converted_img.color_deficit
 
-            print " Type [%s] - Uploaded imgur : %s" % (col_def, 
-                converted_imgs[clv_type][col_def]["link"])
+            # open temp file object
+            temp = StringIO.StringIO()
+
+            # save img to temp file object
+            converted_img.save(temp, format="jpeg")
+        
+            # upload to imgur
+            uploaded_imgs[key][cvd_type] = imgur_helper.upload(
+                imgur,
+                temp,
+                config={"title":imgur_helper.get_image_title(
+                    key,
+                    COLOR_DEFICITS[cvd_type])},
+                anon=False)
+
+            print " Type [%s] - Uploaded imgur : %s" % (cvd_type, 
+            uploaded_imgs[key][cvd_type]["link"])
+
+            temp.close()
+
+    imgur_albums = dict()
 
     # Create 2 albums (simulated, daltonised) with all the images
-    conv_dalt_img_ids = helper.get_converted_img_ids(converted_imgs, "daltonized")
-    daltonized_album = imgur.create_album({
-        "ids":",".join(conv_dalt_img_ids),
-        "title":"Colorblind Enhanced Images",
-        "description":helper.generate_imgur_description(submission, "daltonized")})
+    for key in uploaded_imgs:
+        temp_imgs = uploaded_imgs[key]
 
-    conv_sim_img_ids = helper.get_converted_img_ids(converted_imgs, "simulated")
-    simulated_album = imgur.create_album({
-        "ids":",".join(conv_sim_img_ids),
-        "title":"What Colour-blind Users See",
-        "description":helper.generate_imgur_description(submission, "simulated")})
-                    
-    submission.reply(helper.get_reply_message(converted_imgs,{
-        "simulated":helper.get_imgur_album_link(simulated_album["id"]),
-        "daltonized":helper.get_imgur_album_link(daltonized_album["id"])}))
-        
+        # list of imgur image ids for converted "key"
+        conv_img_ids = [temp_imgs[cvd_type]["id"] 
+            for cvd_type in COLOR_DEFICITS.keys() 
+            if cvd_type in temp_imgs]
 
-def hot_submissions_only(reddit, imgur, started_at, limit=25):
-    for submission in reddit.subreddit("+".join(SUBREDDITS)).hot(limit=limit):
-        if submission.created_utc < started_at:
-            helper.print_skip(submission, "Old submission")
-            continue
+        # create album with images
+        imgur_albums[key] = imgur.create_album({
+            "ids":",".join(conv_img_ids),
+            "title":imgur_helper.generate_imgur_album_title(key),
+            "description":
+                imgur_helper.generate_imgur_description(
+                    submission, 
+                    key)})
 
-        if helper.folder_exists(folder_path):
-            helper.print_skip(submission, "Already daltonised")
-        elif not hasattr(submission, "post_hint") or submission.post_hint != "image":
-            helper.print_skip(submission, "Not an image post")
-        else:
-            helper.print_valid(submission)
+    submission.reply(
+        helper.get_reply_message({
+            "simulated":imgur_helper.get_imgur_album_link(
+                imgur_albums["simulated"]["id"]),
+            "daltonized":imgur_helper.get_imgur_album_link(
+                imgur_albums["daltonized"]["id"])}))
 
-            # submission is valid process it
-            process_submission(reddit, imgur, submission) 
+def test():
+    reddit = helper.get_reddit_instance(credentials.reddit)
+    imgur = imgur_helper.get_imgur_instance(credentials.imgur)
 
-def test_process(reddit, imgur):
     submission_id = "6waxn2"
 
     submission = reddit.submission(submission_id)
@@ -78,28 +96,20 @@ def test_process(reddit, imgur):
 
     process_submission(reddit, imgur, submission)
 
+
 def main():
     started_at = time.time()
     reddit = helper.get_reddit_instance(credentials.reddit)
-    imgur = helper.get_imgur_instance(credentials.imgur)
+    imgur = imgur_helper.get_imgur_instance(credentials.imgur)
 
-    count = interval = 1
+    for submission in reddit.subreddit("+".join(SUBREDDITS)).stream.submissions():
+        if submission.created_utc < started_at:
+            continue
 
-    test_process(reddit, imgur)
+        if (hasattr(submission, "post_hint") 
+            and submission.post_hint == "image"):
+            process_submission(reddit, imgur, submission)
 
-    exit()
-
-    while True:
-        hot_submissions_only(reddit, imgur, started_at, 50)
-
-        print "%s minutes since start - sleep(%s)" % (
-            count,
-            helper.SECONDS_PER_MINUTE * interval)
-
-        time.sleep(helper.SECONDS_PER_MINUTE * interval)
-        count += 1
 
 if __name__ == '__main__':
     main()
-
-

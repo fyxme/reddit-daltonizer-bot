@@ -92,12 +92,13 @@ def simulate_from_image(img, color_deficit="d", return_PIL_Image=True):
     # Colorspace transformation matrices
     
     img = img.copy()
-
     # Simulate monochromacy
     if color_deficit == "m":
         if not return_PIL_Image:
             raise ValueError("Invalid return mode")
-        return img.convert("L")
+        img = img.convert("L")
+        setattr(img, 'color_deficit', color_deficit)
+        return img
 
     # Colorspace transformation matrices
     cb_matrices = {
@@ -125,6 +126,7 @@ def simulate_from_image(img, color_deficit="d", return_PIL_Image=True):
 
     if return_PIL_Image:
         sim_rgb = array_to_img(sim_rgb)
+        setattr(sim_rgb, 'color_deficit', color_deficit)
 
     return sim_rgb
 
@@ -158,6 +160,7 @@ def daltonize_from_image(rgb, color_deficit='d', return_PIL_Image=True):
 
     if return_PIL_Image:
         dtpn = array_to_img(dtpn)
+        setattr(dtpn, 'color_deficit', color_deficit)
 
     return dtpn
 
