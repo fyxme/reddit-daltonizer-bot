@@ -4,7 +4,7 @@ reddit = dict(
     client_secret="",
     username="",
     password="",
-    user_agent=" (created by /u/OffDutyHuman)")
+    user_agent="Daltonism Helper Bot (created by /u/OffDutyHuman)")
 
 imgur = dict(
     client_id="",

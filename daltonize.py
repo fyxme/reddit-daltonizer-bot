@@ -4,7 +4,7 @@
    Written by Hexagonist. Copyright 2017
    Based on original code by Joerg Dietrich. Copyright 2015
 
-   This code is licensed under the GNU GPL version 2, see COPYING for details.
+   This code is licensed under the MIT license, see LICENSE for details.
 """
 
 from collections import OrderedDict
