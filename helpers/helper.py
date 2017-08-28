@@ -23,6 +23,7 @@ def _get_reply_footer(version):
             "^(*I adjust colors of an image submission to accomodate users with colorblindness*)",
             "[^Contact](https://www.reddit.com/message/compose/?to=offdutyhuman)",
             "[^FAQ](https://www.reddit.com/user/DaltonicBot/comments/6v1omy/faq/)",
+            "[^Source](https://github.com/hexagonist/RedditDaltonizerBot)",
             "^v%s" % version))
 
 def get_reply_message(imgur_album_links,version):

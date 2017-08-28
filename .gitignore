@@ -1,4 +1,3 @@
 .DS_Store
 *.pyc
-notes*
 credentials.py
