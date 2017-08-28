@@ -22,9 +22,12 @@ The Reddit Daltonizer Bot ([/u/DaltonicBot](https://www.reddit.com/user/Daltonic
 
 - **To improve it's capabilities:**
     - Allow for multiple images
-    - Allow long reply mode (direct links to images check `helpers.get_long_reply_message()` for more info)
-        - Add album link in superscript too
-    - Attempt (*if possible*) to improve transformation matrices using machine learning (**long term goal**)
+    - Add commands:
+        - Simulated Images only
+        - Enhanced Images only
+        - Long reply mode (direct links to images), check `helpers.get_long_reply_message()` for more info
+            - Add album link in superscript too
+    - Attempt (*if possible*) to improve transformation matrices using machine learning and a user voting system (**long term goal**)
         - colors
         - color saturation
         - brightness
