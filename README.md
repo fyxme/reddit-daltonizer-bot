@@ -9,16 +9,14 @@ The Reddit Daltonizer Bot ([/u/DaltonicBot](https://www.reddit.com/user/Daltonic
 5. To reduce spam and minize the size of it's comments, it then creates two imgur albums (Enhanced images, Simulated images) and replies with directs to both
 
 ### Upcoming changes & improvements
-**To reduce spam:**
+- **To reduce spam:**
 
-- Make the bot summonable. __*The bot will only run continuously when this improvement has been made*__
+    - Make the bot summonable. __*The bot will only run continuously when this improvement has been made*__
+    - Calculate the percentage difference between images to see if a conversion is required
 
-- Calculate the percentage difference between images to see if a conversion is required
-
-**To improve it's capabilities:**
-
-- Allow for multiple images
-- Allow long reply mode (without the albums)
+- **To improve it's capabilities:**
+    - Allow for multiple images
+    - Allow long reply mode (without the albums)
 
 
 
@@ -29,7 +27,7 @@ The Reddit Daltonizer Bot ([/u/DaltonicBot](https://www.reddit.com/user/Daltonic
 - Pillow
 - numpy
 
-*Run setup.sh to install all the requirements*
+*Run `setup.sh` to install all the requirements*
 
 
 ## Contribution
