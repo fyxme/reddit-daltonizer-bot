@@ -4,7 +4,7 @@ The Reddit Daltonizer Bot ([/u/DaltonicBot](https://www.reddit.com/user/Daltonic
 
 ## How does it work?
 1. The bot gets mentionned by a redditor on a post __This is to reduce spam__
-2. It check if the summon is valid and ignores the invalid ones
+2. It checks if the summon is valid and ignores the invalid ones
     - The mention must be a top level comment (a direct reply to the submission)
     - The submission must be an image
     - This is the first time it has been mentionned in this post
@@ -16,6 +16,8 @@ The Reddit Daltonizer Bot ([/u/DaltonicBot](https://www.reddit.com/user/Daltonic
 
 ### Upcoming changes & improvements
 - **To reduce spam:**
+    - Allow the moderators of a Subreddit to tell the bot not to run in that subreddit
+    - Allow the users to tell the bot not to run on their submissions
     - Calculate the percentage difference between images to see if a conversion is required
 
 - **To improve code performance & readability:**

@@ -1,4 +1,3 @@
-# Update the 
 reddit = dict(
     client_id="",
     client_secret="",

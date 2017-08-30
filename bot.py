@@ -84,18 +84,6 @@ def process_submission(reddit, imgur, submission):
                 imgur_albums["daltonized"]["id"])},
             BOT_VERSION))
 
-def test():
-    reddit = helper.get_reddit_instance(credentials.reddit)
-    imgur = imgur_helper.get_imgur_instance(credentials.imgur)
-
-    submission_id = "6waxn2"
-
-    submission = reddit.submission(submission_id)
-
-    print "Testing submission : %s" % submission.shortlink
-
-    process_submission(reddit, imgur, submission)
-
 def is_valid_mention(mention):
     return isinstance(mention, Comment) and mention.new and mention.is_root
 
@@ -120,22 +108,10 @@ def check_mentions(reddit, imgur):
     if valid_mentions:
         reddit.inbox.mark_read(valid_mentions)
 
-
 def main():
-    started_at = time.time()
-    reddit = helper.get_reddit_instance(credentials.reddit)
-    imgur = imgur_helper.get_imgur_instance(credentials.imgur)
-
-    for submission in reddit.subreddit("+".join(SUBREDDITS)).stream.submissions():
-        if submission.created_utc < started_at:
-            continue
-
-        if (hasattr(submission, "post_hint")
-            and submission.post_hint == "image"):
-            process_submission(reddit, imgur, submission)
-
-
-if __name__ == '__main__':
     reddit = helper.get_reddit_instance(credentials.reddit)
     imgur = imgur_helper.get_imgur_instance(credentials.imgur)
     check_mentions(reddit, imgur)
+
+if __name__ == '__main__':
+    main()
