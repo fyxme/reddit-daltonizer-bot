@@ -14,13 +14,13 @@ def get_reddit_instance(reddit_credentials):
 def _get_formated_links(name, converted_imgs):
     temp = ""
     for col in converted_imgs[name]:
-        temp += " [%s](%s) |" % (daltonizer.deficit_to_fullname(col), 
+        temp += " [%s](%s) |" % (daltonizer.deficit_to_fullname(col),
                                  converted_imgs[name][col]["link"])
     return temp[1:-1]
 
 def _get_reply_footer(version):
     return "^( | )".join((
-            "^(*I adjust colors of an image submission to accomodate users with colorblindness*)",
+            "^(*Helping redditors with colorblindness*)",
             "[^Contact](https://www.reddit.com/message/compose/?to=offdutyhuman)",
             "[^FAQ](https://www.reddit.com/user/DaltonicBot/comments/6v1omy/faq/)",
             "[^Source](https://github.com/hexagonist/RedditDaltonizerBot)",
@@ -58,6 +58,6 @@ def difference_between_images(img1_path,img2_path):
         dif = sum(abs(p1-p2) for p1,p2 in pairs)
     else:
         dif = sum(abs(c1-c2) for p1,p2 in pairs for c1,c2 in zip(p1,p2))
-     
+
     ncomponents = i1.size[0] * i1.size[1] * 3
     return (dif / 255.0 * 100) / ncomponents
