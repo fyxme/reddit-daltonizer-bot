@@ -4,11 +4,12 @@ import time
 import credentials
 from daltonize import DaltonizableImageFromURL
 from helpers import helper, imgur_helper
+from praw.models import Comment
 import StringIO
 
 import collections
 
-BOT_VERSION = "0.3.3"
+BOT_VERSION = "0.3.4"
 
 SUBREDDITS = ["colorblind", "test"]
 
@@ -41,7 +42,7 @@ def process_submission(reddit, imgur, submission):
 
             # save img to temp file object
             converted_img.save(temp, format="jpeg")
-        
+
             # upload to imgur
             uploaded_imgs[key][cvd_type] = imgur_helper.upload(
                 imgur,
@@ -51,7 +52,7 @@ def process_submission(reddit, imgur, submission):
                     COLOR_DEFICITS[cvd_type])},
                 anon=False)
 
-            print " Type [%s] - Uploaded imgur : %s" % (cvd_type, 
+            print " Type [%s] - Uploaded imgur : %s" % (cvd_type,
             uploaded_imgs[key][cvd_type]["link"])
 
             temp.close()
@@ -63,8 +64,8 @@ def process_submission(reddit, imgur, submission):
         temp_imgs = uploaded_imgs[key]
 
         # list of imgur image ids for converted "key"
-        conv_img_ids = [temp_imgs[cvd_type]["id"] 
-            for cvd_type in COLOR_DEFICITS.keys() 
+        conv_img_ids = [temp_imgs[cvd_type]["id"]
+            for cvd_type in COLOR_DEFICITS.keys()
             if cvd_type in temp_imgs]
 
         # create album with images
@@ -73,12 +74,11 @@ def process_submission(reddit, imgur, submission):
             "title":imgur_helper.generate_imgur_album_title(key),
             "description":
                 imgur_helper.generate_imgur_description(
-                    submission, 
+                    submission,
                     key)})
 
-    submission.reply(
-        helper.get_reply_message({
-            "simulated":imgur_helper.get_imgur_album_link(
+    return (helper.get_reply_message(
+            {"simulated":imgur_helper.get_imgur_album_link(
                 imgur_albums["simulated"]["id"]),
             "daltonized":imgur_helper.get_imgur_album_link(
                 imgur_albums["daltonized"]["id"])},
@@ -96,6 +96,30 @@ def test():
 
     process_submission(reddit, imgur, submission)
 
+def is_valid_mention(mention):
+    return isinstance(mention, Comment) and mention.new and mention.is_root
+
+def is_valid_submission(submission):
+    return (not submission.saved
+            and hasattr(submission, "post_hint")
+            and submission.post_hint == "image")
+
+def check_mentions(reddit, imgur):
+    valid_mentions = [mention for mention in reddit.inbox.mentions() if is_valid_mention(mention)]
+
+    for valid_mention in valid_mentions:
+        submission = valid_mention.submission
+        # check if the submission is an image
+        # and that we haven't replied to it yet
+        if is_valid_submission(submission):
+            reply_msg = process_submission(reddit, imgur, submission)
+            valid_mention.reply(reply_msg)
+            submission.save()
+
+    # mark all new mentions as red
+    if valid_mentions:
+        reddit.inbox.mark_read(valid_mentions)
+
 
 def main():
     started_at = time.time()
@@ -106,10 +130,12 @@ def main():
         if submission.created_utc < started_at:
             continue
 
-        if (hasattr(submission, "post_hint") 
+        if (hasattr(submission, "post_hint")
             and submission.post_hint == "image"):
             process_submission(reddit, imgur, submission)
 
 
 if __name__ == '__main__':
-    main()
+    reddit = helper.get_reddit_instance(credentials.reddit)
+    imgur = imgur_helper.get_imgur_instance(credentials.imgur)
+    check_mentions(reddit, imgur)

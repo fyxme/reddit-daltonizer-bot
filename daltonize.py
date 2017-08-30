@@ -26,10 +26,10 @@ class DaltonizableImage(object):
         self.img = img
 
     def simulate(self,color_deficit="d"):
-        """ 
-            Simulate daltonism 
+        """
+            Simulate daltonism
             Arguments:
-                [string] color_deficit  - color deficit(s) to simulate 
+                [string] color_deficit  - color deficit(s) to simulate
                     Allows single or multiple deficits
         """
         if not self.img:
@@ -37,10 +37,10 @@ class DaltonizableImage(object):
         return [simulate_from_image(self.img, c) for c in color_deficit]
 
     def daltonize(self, color_deficit="d"):
-        """ 
+        """
             Daltonize image
             Arguments:
-                [string] color_deficit  - color deficit(s) to daltonize 
+                [string] color_deficit  - color deficit(s) to daltonize
                     Allows single or multiple deficits
         """
         if not self.img:
@@ -50,12 +50,10 @@ class DaltonizableImage(object):
 class DaltonizableImageFromURL(DaltonizableImage):
     def __init__(self, url):
         super(DaltonizableImageFromURL, self).__init__(Image.open(urllib2.urlopen(url)))
-        
+
 class DaltonizableImageFromPath(DaltonizableImage):
     def __init__(self, path):
         super(DaltonizableImageFromPath, self).__init__(Image.open(path))
-
-
 
 def transform_colorspace(img, mat):
     """Transform image to a different color space.
@@ -90,7 +88,7 @@ def simulate_from_image(img, color_deficit="d", return_PIL_Image=True):
         simulated image in RGB format
     """
     # Colorspace transformation matrices
-    
+
     img = img.copy()
     # Simulate monochromacy
     if color_deficit == "m":

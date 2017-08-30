@@ -3,17 +3,19 @@ The Reddit Daltonizer Bot ([/u/DaltonicBot](https://www.reddit.com/user/Daltonic
 
 
 ## How does it work?
-1. The bot finds a valid image submission
-2. It stores the image's data
-3. It converts the image's colors to enhance it for colorblind users and simulate what colorblinds see
-4. It uploads all the converted images to imgur
-5. To reduce spam and minize the size of it's comments, it then creates two imgur albums (Enhanced images, Simulated images) and replies with directs to both
+1. The bot gets mentionned by a redditor on a post __This is to reduce spam__
+2. It check if the summon is valid and ignores the invalid ones
+    - The mention must be a top level comment (a direct reply to the submission)
+    - The submission must be an image
+    - This is the first time it has been mentionned in this post
+3. It stores the image's data
+4. It converts the image's colors to enhance it for colorblind users and simulate what colorblinds see
+5. It uploads all the converted images to imgur
+6. To reduce spam and minize the size of it's comments, it then creates two imgur albums (Enhanced images, Simulated images) and replies with direct links to both
 
 
 ### Upcoming changes & improvements
 - **To reduce spam:**
-    - Make the bot summonable. 
-        - __*The bot will only run continuously when this improvement has been made*__
     - Calculate the percentage difference between images to see if a conversion is required
 
 - **To improve code performance & readability:**
