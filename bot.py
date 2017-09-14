@@ -9,9 +9,14 @@ import StringIO
 
 import collections
 
-BOT_VERSION = "0.3.4"
+BOT_VERSION = "0.3.5"
 
-SUBREDDITS = ["colorblind", "test"]
+SUBREDDITS = ["colorblind"]
+
+SECONDS_PER_MIN = 60
+
+# Number of times per minute to run
+RUN_EVERY_X = 5
 
 COLOR_DEFICITS = collections.OrderedDict([
     ("d", "deuteranopia"),
@@ -92,6 +97,12 @@ def is_valid_submission(submission):
             and hasattr(submission, "post_hint")
             and submission.post_hint == "image")
 
+def daltonize_submission(reddit, imgur, submission):
+    print "Processing submssion [id : {}]".format(submission.id)
+    reply_msg = process_submission(reddit, imgur, submission)
+    valid_mention.reply(reply_msg)
+    submission.save()
+
 def check_mentions(reddit, imgur):
     valid_mentions = [mention for mention in reddit.inbox.mentions() if is_valid_mention(mention)]
 
@@ -100,18 +111,46 @@ def check_mentions(reddit, imgur):
         # check if the submission is an image
         # and that we haven't replied to it yet
         if is_valid_submission(submission):
-            reply_msg = process_submission(reddit, imgur, submission)
-            valid_mention.reply(reply_msg)
-            submission.save()
-
+            daltonize_submission(reddit, imgur, submission)
+            
     # mark all new mentions as red
     if valid_mentions:
         reddit.inbox.mark_read(valid_mentions)
 
+def check_submissions(reddit, imgur, subs, start_time):
+    for submission in reddit.subreddit("+".join(subs)).new():
+        if (submission.created_utc > start_time 
+            and is_valid_submission(submission)):
+            daltonize_submission(reddit, imgur, submission)
+
 def main():
     reddit = helper.get_reddit_instance(credentials.reddit)
     imgur = imgur_helper.get_imgur_instance(credentials.imgur)
-    check_mentions(reddit, imgur)
+    start_time = time.time()
+
+    while True:
+        # current number of minutes the program has been running
+        current_mins = (time.time() - start_time) // 60
+        print "[Elapsed minutes : {}]".format(current_mins)
+
+        # Check for mentions every minute
+        print "Checking mentions"
+        check_mentions(reddit, imgur)
+
+        # run once every x minutes
+        if current_mins % RUN_EVERY_X == 0:        
+            try:
+                # Check for submission every X minutes
+                print "Checking submissions"
+                check_submissions(reddit, imgur, SUBREDDITS, start_time)
+            except KeyboardInterrupt:
+                raise
+            except Exception, e:
+                print str(e)
+
+        print "Sleeping {} seconds".format(SECONDS_PER_MIN)
+        time.sleep(SECONDS_PER_MIN)
+
 
 if __name__ == '__main__':
     main()
