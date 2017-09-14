@@ -9,7 +9,7 @@ import StringIO
 
 import collections
 
-BOT_VERSION = "0.3.5"
+BOT_VERSION = "0.3.6"
 
 SUBREDDITS = ["colorblind"]
 
@@ -97,10 +97,13 @@ def is_valid_submission(submission):
             and hasattr(submission, "post_hint")
             and submission.post_hint == "image")
 
-def daltonize_submission(reddit, imgur, submission):
+def daltonize_submission(reddit, imgur, submission, replyable=None):
+    if not replyable:
+        replyable = submission
+
     print "Processing submssion [id : {}]".format(submission.id)
     reply_msg = process_submission(reddit, imgur, submission)
-    valid_mention.reply(reply_msg)
+    replyable.reply(reply_msg)
     submission.save()
 
 def check_mentions(reddit, imgur):
@@ -111,7 +114,11 @@ def check_mentions(reddit, imgur):
         # check if the submission is an image
         # and that we haven't replied to it yet
         if is_valid_submission(submission):
-            daltonize_submission(reddit, imgur, submission)
+            daltonize_submission(
+                reddit, 
+                imgur,
+                submission,
+                replyable=valid_mention)
 
     # mark all new mentions as red
     if valid_mentions:
