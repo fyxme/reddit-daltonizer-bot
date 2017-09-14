@@ -112,7 +112,7 @@ def check_mentions(reddit, imgur):
         # and that we haven't replied to it yet
         if is_valid_submission(submission):
             daltonize_submission(reddit, imgur, submission)
-            
+
     # mark all new mentions as red
     if valid_mentions:
         reddit.inbox.mark_read(valid_mentions)
@@ -150,7 +150,6 @@ def main():
 
         print "Sleeping {} seconds".format(SECONDS_PER_MIN)
         time.sleep(SECONDS_PER_MIN)
-
 
 if __name__ == '__main__':
     main()
