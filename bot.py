@@ -62,8 +62,8 @@ def process_submission(reddit, imgur, submission):
                     COLOR_DEFICITS[cvd_type])},
                 anon=False)
 
-            log(" Type [%s] - Uploaded imgur : %s" % (cvd_type,)
-            uploaded_imgs[key][cvd_type]["link"])
+            log(" Type [%s] - Uploaded imgur : %s" % (cvd_type,
+            uploaded_imgs[key][cvd_type]["link"]))
 
             temp.close()
 
