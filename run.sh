@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-if [ $# -e 1 && "$1" == "stop" ] || [ $(ps -p `cat /tmp/daltonizer.pid`) ]; then
+if [ $# -e 1 && "$1" == "stop" ] || [ -e /tmp/daltonizer.pid && $(ps -p `cat /tmp/daltonizer.pid`) ]; then
     # kill if already running or stop command issued
     echo "Killing old bot"
     kill -9 `cat /tmp/daltonizer.pid`
 elif [ $# -e 1 && "$1" == "status" ]; then
-    if [ $(ps -p `cat /tmp/daltonizer.pid`) ]; then
+    if [ -e /tmp/daltonizer.pid && $(ps -p `cat /tmp/daltonizer.pid`) ]; then
         echo "Bot is running."
     else
         echo "Bot is not running"
