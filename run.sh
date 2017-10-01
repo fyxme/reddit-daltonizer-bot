@@ -17,5 +17,5 @@ kill -9 `cat /tmp/daltonizer.pid`
 
 echo "Starting new bot"
 # if no command issued, run the program
-echo $$ > /tmp/daltonizer.pid
 nohup python /root/daltonizer/bot.py </dev/null >/tmp/daltonizer.error 2>&1 &
+echo $! > /tmp/daltonizer.pid

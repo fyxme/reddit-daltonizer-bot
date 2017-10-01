@@ -27,7 +27,7 @@ COLOR_DEFICITS = collections.OrderedDict([
 def log(line):
     # append to file
     with open('out.log','a') as out:
-        out.write(line)
+        out.write(line + "\n")
 
 def process_submission(reddit, imgur, submission):
     folder_path = "img/%s" % submission.id
