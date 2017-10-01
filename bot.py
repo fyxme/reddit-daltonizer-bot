@@ -11,7 +11,7 @@ import collections
 
 BOT_VERSION = "0.3.6"
 
-SUBREDDITS = ["colorblind"]
+SUBREDDITS = ["colorblind","test"]
 
 SECONDS_PER_MIN = 60
 
@@ -115,7 +115,7 @@ def check_mentions(reddit, imgur):
         # and that we haven't replied to it yet
         if is_valid_submission(submission):
             daltonize_submission(
-                reddit, 
+                reddit,
                 imgur,
                 submission,
                 replyable=valid_mention)
@@ -126,7 +126,7 @@ def check_mentions(reddit, imgur):
 
 def check_submissions(reddit, imgur, subs, start_time):
     for submission in reddit.subreddit("+".join(subs)).new():
-        if (submission.created_utc > start_time 
+        if (submission.created_utc > start_time
             and is_valid_submission(submission)):
             daltonize_submission(reddit, imgur, submission)
 
@@ -145,7 +145,7 @@ def main():
         check_mentions(reddit, imgur)
 
         # run once every x minutes
-        if current_mins % RUN_EVERY_X == 0:        
+        if current_mins % RUN_EVERY_X == 0:
             try:
                 # Check for submission every X minutes
                 print "Checking submissions"
