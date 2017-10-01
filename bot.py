@@ -24,6 +24,11 @@ COLOR_DEFICITS = collections.OrderedDict([
     ("t", "tritanopia"),
     ("m", "monochromacy")])
 
+def log(line):
+    # append to file
+    with open('out.log','a') as out:
+        out.write(line)
+
 def process_submission(reddit, imgur, submission):
     folder_path = "img/%s" % submission.id
 
@@ -38,7 +43,7 @@ def process_submission(reddit, imgur, submission):
         simulated=dict())
 
     for key in converted_imgs:
-        print key
+        log(key)
         for converted_img in converted_imgs[key]:
             cvd_type = converted_img.color_deficit
 
@@ -57,7 +62,7 @@ def process_submission(reddit, imgur, submission):
                     COLOR_DEFICITS[cvd_type])},
                 anon=False)
 
-            print " Type [%s] - Uploaded imgur : %s" % (cvd_type,
+            log(" Type [%s] - Uploaded imgur : %s" % (cvd_type,)
             uploaded_imgs[key][cvd_type]["link"])
 
             temp.close()
@@ -101,7 +106,7 @@ def daltonize_submission(reddit, imgur, submission, replyable=None):
     if not replyable:
         replyable = submission
 
-    print "Processing submssion [id : {}]".format(submission.id)
+    log("Processing submssion [id : {}]".format(submission.id))
     reply_msg = process_submission(reddit, imgur, submission)
     replyable.reply(reply_msg)
     submission.save()
@@ -138,24 +143,24 @@ def main():
     while True:
         # current number of minutes the program has been running
         current_mins = (time.time() - start_time) // 60
-        print "[Elapsed minutes : {}]".format(current_mins)
+        log("[Elapsed minutes : {}]".format(current_mins))
 
         # Check for mentions every minute
-        print "Checking mentions"
+        log("Checking mentions")
         check_mentions(reddit, imgur)
 
         # run once every x minutes
         if current_mins % RUN_EVERY_X == 0:
             try:
                 # Check for submission every X minutes
-                print "Checking submissions"
+                log("Checking submissions")
                 check_submissions(reddit, imgur, SUBREDDITS, start_time)
             except KeyboardInterrupt:
                 raise
             except Exception, e:
-                print str(e)
+                log(str(e))
 
-        print "Sleeping {} seconds".format(SECONDS_PER_MIN)
+        log("Sleeping {} seconds".format(SECONDS_PER_MIN))
         time.sleep(SECONDS_PER_MIN)
 
 if __name__ == '__main__':
