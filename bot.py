@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import time
+import datetime
 import credentials
 from daltonize import DaltonizableImageFromURL
 from helpers import helper, imgur_helper
@@ -146,15 +147,12 @@ def run_as_crontab(reddit,imgur,only_after=RUN_EVERY_X):
     only_after = time.time() - SECONDS_PER_MIN * RUN_EVERY_X
 
     try:
-        log("Checking submissions")
+        log("Checking for submissions after {}".format(only_after))
         check_submissions(reddit, imgur, SUBREDDITS, only_after=only_after)
     except KeyboardInterrupt:
         raise
     except Exception, e:
         log(str(e))
-
-    log("Sleeping {} seconds".format(SECONDS_PER_MIN))
-    time.sleep(SECONDS_PER_MIN)
 
 def run_as_loop(reddit,imgur):
     start_time = time.time()
@@ -191,7 +189,11 @@ def main():
     reddit = helper.get_reddit_instance(credentials.reddit)
     imgur = imgur_helper.get_imgur_instance(credentials.imgur)
 
-    run_as_loop(reddit, imgur)
+    date = datetime.datetime.now()
+
+    log("Start time : {}".format(date))
+
+    run_as_crontab(reddit, imgur)
 
 if __name__ == '__main__':
     main()
