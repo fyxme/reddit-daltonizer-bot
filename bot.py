@@ -10,14 +10,14 @@ import StringIO
 
 import collections
 
-BOT_VERSION = "0.3.8"
+BOT_VERSION = "0.3.9"
 
-SUBREDDITS = ["test"]
+SUBREDDITS = ["colorblind"]
 
 SECONDS_PER_MIN = 60
 
 # run every X minutes
-RUN_EVERY_X = 5
+RUN_EVERY_X = 2
 
 COLOR_DEFICITS = collections.OrderedDict([
     ("d", "deuteranopia"),
@@ -93,7 +93,8 @@ def process_submission(reddit, imgur, submission):
                 imgur_albums["simulated"]["id"]),
             "daltonized":imgur_helper.get_imgur_album_link(
                 imgur_albums["daltonized"]["id"])},
-            BOT_VERSION))
+            BOT_VERSION,
+            is_autocomment=True))
 
 def is_valid_mention(mention):
     return isinstance(mention, Comment) and mention.new and mention.is_root
@@ -143,6 +144,7 @@ def check_submissions(reddit, imgur, subs, start_time=None, only_after=None):
 def run_as_crontab(reddit,imgur,only_after=RUN_EVERY_X):
     log("Checking mentions")
     check_mentions(reddit, imgur)
+
     # check for submissions only between current time and last time we checked
     only_after = time.time() - SECONDS_PER_MIN * RUN_EVERY_X
 

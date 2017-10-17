@@ -18,21 +18,28 @@ def _get_formated_links(name, converted_imgs):
                                  converted_imgs[name][col]["link"])
     return temp[1:-1]
 
-def _get_reply_footer(version):
-    return "^( | )".join((
-            "^(*Helping redditors with colorblindness*)",
-            "[^Contact](https://www.reddit.com/message/compose/?to=offdutyhuman)",
-            "[^FAQ](https://www.reddit.com/user/DaltonicBot/comments/6v1omy/faq/)",
-            "[^Source](https://github.com/hexagonist/RedditDaltonizerBot)",
-            "^v%s" % version))
+def _get_reply_footer(version, is_autocomment=False):
+    footer = "^( | )".join((
+        "^(*Mention me in the comments of an image post to summon me!*)",
+        "[^/r/colorblind](https://www.reddit.com/r/colorblind)",
+        "[^Contact](https://www.reddit.com/message/compose/?to=offdutyhuman)",
+        "[^FAQ](https://www.reddit.com/user/DaltonicBot/comments/6v1omy/faq/)",
+        "[^Source](https://github.com/hexagonist/RedditDaltonizerBot)",
+        "^v%s" % version))
 
-def get_reply_message(imgur_album_links,version):
+    if is_autocomment:
+        # if is autocomment -> prepend message to footer
+        footer = "I auto-comment in /r/colorblind.\n\n----\n\n" + footer
+
+    return footer
+
+def get_reply_message(imgur_album_links,version,is_autocomment=False):
     return "\n\n".join((
         " | ".join((
             "**[Colorblind Enhanced Images](%s)**" % imgur_album_links["daltonized"],
             "**[What colorblind users see](%s)**" % imgur_album_links["simulated"])),
         "----",
-        _get_reply_footer(version)))
+        _get_reply_footer(version,is_autocomment)))
 
 def get_long_reply_message(converted_imgs, version):
     return "\n\n".join((
