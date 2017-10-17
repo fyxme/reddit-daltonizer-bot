@@ -9,13 +9,13 @@ import StringIO
 
 import collections
 
-BOT_VERSION = "0.3.6"
+BOT_VERSION = "0.3.8"
 
-SUBREDDITS = ["colorblind","test"]
+SUBREDDITS = ["test"]
 
 SECONDS_PER_MIN = 60
 
-# Number of times per minute to run
+# run every X minutes
 RUN_EVERY_X = 5
 
 COLOR_DEFICITS = collections.OrderedDict([
@@ -129,15 +129,34 @@ def check_mentions(reddit, imgur):
     if valid_mentions:
         reddit.inbox.mark_read(valid_mentions)
 
-def check_submissions(reddit, imgur, subs, start_time):
+def check_submissions(reddit, imgur, subs, start_time=None, only_after=None):
     for submission in reddit.subreddit("+".join(subs)).new():
-        if (submission.created_utc > start_time
-            and is_valid_submission(submission)):
+        if ((start_time and not submission.created_utc > start_time)
+            or (only_after and not submission.created_utc > only_after)):
+            # skip if submission is after start_time
+            continue
+
+        if is_valid_submission(submission):
             daltonize_submission(reddit, imgur, submission)
 
-def main():
-    reddit = helper.get_reddit_instance(credentials.reddit)
-    imgur = imgur_helper.get_imgur_instance(credentials.imgur)
+def run_as_crontab(reddit,imgur,only_after=RUN_EVERY_X):
+    log("Checking mentions")
+    check_mentions(reddit, imgur)
+    # check for submissions only between current time and last time we checked
+    only_after = time.time() - SECONDS_PER_MIN * RUN_EVERY_X
+
+    try:
+        log("Checking submissions")
+        check_submissions(reddit, imgur, SUBREDDITS, only_after=only_after)
+    except KeyboardInterrupt:
+        raise
+    except Exception, e:
+        log(str(e))
+
+    log("Sleeping {} seconds".format(SECONDS_PER_MIN))
+    time.sleep(SECONDS_PER_MIN)
+
+def run_as_loop(reddit,imgur):
     start_time = time.time()
 
     while True:
@@ -154,7 +173,12 @@ def main():
             try:
                 # Check for submission every X minutes
                 log("Checking submissions")
-                check_submissions(reddit, imgur, SUBREDDITS, start_time)
+                check_submissions(
+                    reddit,
+                    imgur,
+                    SUBREDDITS,
+                    start_time=start_time)
+
             except KeyboardInterrupt:
                 raise
             except Exception, e:
@@ -162,6 +186,12 @@ def main():
 
         log("Sleeping {} seconds".format(SECONDS_PER_MIN))
         time.sleep(SECONDS_PER_MIN)
+
+def main():
+    reddit = helper.get_reddit_instance(credentials.reddit)
+    imgur = imgur_helper.get_imgur_instance(credentials.imgur)
+
+    run_as_loop(reddit, imgur)
 
 if __name__ == '__main__':
     main()
